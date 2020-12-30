@@ -20,12 +20,13 @@ using System.Windows.Threading;
 
 namespace ML
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
+     /// <summary>
+     /// Interaction logic for MainWindow.xaml
+     /// </summary>
      partial class MainWindow : Window
      {
         public delegate void UpdateTextCallback(string message);
+        public delegate void UpdateLabelCallback(string text);
         public delegate void UpdateImageCallback(Bitmap bitmap);
         private int line;
         private string pixelFile = @"train-images.idx3-ubyte";
@@ -168,6 +169,9 @@ namespace ML
                 await LoadTreningData(testImages);
                 for (int t = 0; t < 10000; t++)
                 {
+                    DigitImage currImage = testImages[t];
+                    Bitmap bitMap = MakeBitmap(currImage, 6);
+                    TestFoto.Dispatcher.Invoke(new UpdateImageCallback(this.UpdateImage), bitMap);
                     await CountHLOutput(t);
                     await CountOLOutput(t);
                     await CheckResult(t);
@@ -302,6 +306,7 @@ namespace ML
             new object[] { $"{o}-{result[o]}-{labels[ImageNum]}" });
           
             }
+            ResultLabel.Dispatcher.Invoke(new UpdateLabelCallback(this.UpdateLabel),new object[] { labels[ImageNum] });
             return Task.CompletedTask;
         }
         public Task ErrorHiddenOuT(int ImageNum)
@@ -348,25 +353,6 @@ namespace ML
                     this.outputBox.AppendText(message);
         }
 
-        private async void Button_Click_3(object sender, RoutedEventArgs e)
-        {
-            outputBox.AppendText("ok");
-            List<Task> list = new List<Task>();
-            await Task.Factory.StartNew(() =>
-            {
-                do
-                {
-                    someAsync();
-         
-                } while (true);
-            });
-            outputBox.AppendText("ok2");
-        }
-        public Task someAsync()
-        {
-            
-            return Task.CompletedTask;
-        }
         private void UpdateText(string message)
         {
             outputBox.AppendText(message + "\n");
@@ -376,6 +362,10 @@ namespace ML
         private void UpdateImage(Bitmap image)
         {
             foto.Source = image.ToBitmapImage();
+        }
+        private void UpdateLabel(string label)
+        {
+            ResultLabel.Content = label;
         }
      }
 }

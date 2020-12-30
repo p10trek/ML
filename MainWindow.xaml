@@ -13,20 +13,28 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="3*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="3*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="3*"/>
         </Grid.RowDefinitions>
-        <Button Click="Button_Click"/>
-        <Button Grid.Column="0" Grid.Row="1" Click="Button_Click_1"/>
-        <Button Grid.Column="0" Grid.Row="2" Click="Button_Click_2"/>
-        <Image Grid.Column="2" Grid.Row="0" x:Name="foto"/>
-        <RichTextBox Grid.Column="1" Grid.Row="0" Grid.RowSpan="3"  x:Name="outputBox"
+        <Label>Control Panel</Label>
+        <Button Click="Button_Click" Grid.Row="1" Grid.RowSpan="2"/>
+        <Button Grid.Column="0" Grid.Row="4" Grid.RowSpan="2" Click="Button_Click_2"/>
+        <Label Grid.Row="0" Grid.Column="2">Learning</Label>
+        <Image Grid.Column="2" Grid.Row="1" x:Name="foto"/>
+        <Label Grid.Row="0" Grid.Column="1">Output Console</Label>
+        <Label Grid.Row="2" Grid.Column="2">Testing</Label>
+        <Image Grid.Column="2" Grid.Row="3" x:Name="TestFoto"/>
+        <Label Grid.Row="4" Grid.Column="2">Image Label</Label>
+        <RichTextBox Grid.Column="1" Grid.Row="1" Grid.RowSpan="5"  x:Name="outputBox"
                      VerticalScrollBarVisibility="Visible" 
                      HorizontalScrollBarVisibility="Visible" 
                      IsReadOnly="True">
             <FlowDocument/>
         </RichTextBox>
-        <Button Grid.Column="2" Grid.Row="1" Click="Button_Click_3"/>
+        <Label Name="ResultLabel" Grid.Row="5" Grid.Column="2" FontSize="50"  HorizontalAlignment="Center"  VerticalAlignment="Center"/>
     </Grid>
 </Window>
