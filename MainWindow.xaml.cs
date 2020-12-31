@@ -134,14 +134,14 @@ namespace ML
             Bitmap bitMap = MakeBitmap(currImage, 6);
             foto.Source = bitMap.ToBitmapImage();
         }
-        private void Button_Click_2(object sender, RoutedEventArgs e)
+        private async void Button_Click_2(object sender, RoutedEventArgs e)
         {
-               Task<bool> LernTask =  Lern();  
+               bool LernTask =  await Lern(); 
         }
 
         public async Task<bool> Lern()
         {
-            List<Task> tasks = new List<Task>();
+            
             await Task.Factory.StartNew(async () =>
             {
 
@@ -171,7 +171,7 @@ namespace ML
                 {
                     DigitImage currImage = testImages[t];
                     Bitmap bitMap = MakeBitmap(currImage, 6);
-                    TestFoto.Dispatcher.Invoke(new UpdateImageCallback(this.UpdateImage), bitMap);
+                    TestFoto.Dispatcher.Invoke(new UpdateImageCallback(this.UpdateTestImage), bitMap);
                     await CountHLOutput(t);
                     await CountOLOutput(t);
                     await CheckResult(t);
@@ -283,14 +283,11 @@ namespace ML
             for (int o = 0; o < outputs.Length; o++)
             {
                 ErrorTotalOutputs += Math.Pow((labels[ImageNum] - outputs[o]), 2) / 2;
-                outputBox.Dispatcher.Invoke(
-                new UpdateTextCallback(this.UpdateText),
-                new object[] { $"{o}-{Math.Pow((labels[ImageNum] - outputs[o]), 2) / 2}-{labels[ImageNum]}"});
+               
             }
-            //outputBox.AppendText($"{o}-{Math.Pow((labels[ImageNum] - outputs[o]), 2) / 2}-{labels[ImageNum]}");
-            //$"{o}-{Math.Pow((labels[ImageNum] - outputs[o]), 2) / 2}-{labels[ImageNum]}"
-            //await OutputMessageToLogWindow("Calkowity:");
-            //await OutputMessageToLogWindow(ErrorTotalOutputs.ToString());
+            outputBox.Dispatcher.Invoke(
+               new UpdateTextCallback(this.UpdateText),
+               new object[] { $"Total Error = {ErrorTotalOutputs} for label = {labels[ImageNum]}" });
             return Task.CompletedTask;
 
         }
@@ -301,12 +298,13 @@ namespace ML
             for (int o = 0; o < outputs.Length; o++)
             {
                 result[o] = Math.Pow((labels[ImageNum] - outputs[o]), 2) / 2;
-                outputBox.Dispatcher.Invoke(
-            new UpdateTextCallback(this.UpdateText),
-            new object[] { $"{o}-{result[o]}-{labels[ImageNum]}" });
+                
           
             }
-            ResultLabel.Dispatcher.Invoke(new UpdateLabelCallback(this.UpdateLabel),new object[] { labels[ImageNum] });
+            outputBox.Dispatcher.Invoke(
+            new UpdateTextCallback(this.UpdateText),
+            new object[] { $"Result total error: {result.Sum()} for label: {labels[ImageNum]}" });
+            ResultLabel.Dispatcher.Invoke(new UpdateLabelCallback(this.UpdateLabel),new object[] { labels[ImageNum].ToString() });
             return Task.CompletedTask;
         }
         public Task ErrorHiddenOuT(int ImageNum)
@@ -348,20 +346,27 @@ namespace ML
         }
         private static readonly object synchLock = new object();
 
-        private void OutputMessageToLogWindow(string message)
-        {
-                    this.outputBox.AppendText(message);
-        }
-
+        private short counter = 0;
         private void UpdateText(string message)
         {
+            if (counter == 3000)
+            { 
+                outputBox.Document.Blocks.Clear();
+                counter = 0; 
+            }
             outputBox.AppendText(message + "\n");
             outputBox.AppendText("\u2028"); // Linebreak, not paragraph break
             outputBox.ScrollToEnd();
+            counter++;
         }
         private void UpdateImage(Bitmap image)
         {
             foto.Source = image.ToBitmapImage();
+            //Commented for performance reason
+        }
+        private void UpdateTestImage(Bitmap image)
+        {
+            TestFoto.Source = image.ToBitmapImage();
         }
         private void UpdateLabel(string label)
         {
